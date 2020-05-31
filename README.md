@@ -143,6 +143,18 @@ stop command or a hard shutdown:
 wfpiconsole stop
 ```
 
+### Screen Blanking
+
+If you have problems with your Raspberry Pi screen going dark. The following little config should prevent that
+
+```
+mkdir -p ~/.config/lxsession/LXDE-pi/
+echo '@xset s noblank' > ~/.config/lxsession/LXDE-pi/autostart
+echo '@xset s off' >>  ~/.config/lxsession/LXDE-pi/autostart
+echo '@xset s -dpms' >>  ~/.config/lxsession/LXDE-pi/autostart
+```
+After the next reboot (or logout & login back in), the screen should not blank any longer.
+
 ## Advanced Installation: Windows
 
 Although not officially supported, use the following step-by-step instructions
