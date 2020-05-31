@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="10mm"
+   height="10mm"
+   viewBox="0 0 10 10"
+   version="1.1"
+   id="svg547"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="WeatherFlow-2.svg">
+  <defs
+     id="defs541" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="57.190631"
+     inkscape:cy="50.180994"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="3840"
+     inkscape:window-height="2045"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata544">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <style type="text/css">
+        .st0{display:none;}
+        .st_red{display:inline;fill:#870000;}
+        .st_yellow{display:inline;fill:#cece00;}
+        .st_green{display:inline;fill:#008700;}
+        .st_blue{display:inline;fill:#0055B8;}
+        .st2{display:inline;}
+        .st3{fill:#0055B8;}
+  </style>
+  <g class="st_blue"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-287)">
+    <g
+       transform="matrix(0.37041666,0,0,0.37041666,-30.143295,280.5571)"
+       id="g32">
+      <path
+         inkscape:connector-curvature="0"
+         id="path28"
+         d="m 99.939537,25.625292 c -2.105598,-0.07373 -3.333244,1.050844 -3.616013,2.1418 -0.283043,1.091083 0.585884,0.68659 0.585884,0.68659 3.009781,-1.212036 3.353532,1.636541 3.353532,1.636541 0.7272,6.363619 -14.605874,13.393873 -14.605874,13.393873 v 0.08059 c 4.444489,-0.323128 12.141159,-3.151143 15.797504,-6.121086 3.36095,-2.73024 4.32313,-5.67623 3.45463,-8.383349 -0.72836,-2.269659 -2.66642,-3.353163 -4.969663,-3.434963" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path30"
+         d="m 102.6236,21.629538 c -0.70004,-2.181731 -2.56415,-3.224234 -4.778362,-3.302269 -2.024994,-0.07149 -3.204964,1.009956 -3.477227,2.058889 -0.271995,1.049028 0.563561,0.661036 0.563561,0.661036 2.894241,-1.166073 3.224144,1.573158 3.224144,1.573158 0.699447,6.118654 -14.043823,12.878267 -14.043823,12.878267 v 0.07734 c 4.273315,-0.310696 11.674293,-3.029881 15.190254,-5.885636 3.231503,-2.624405 4.156643,-5.457624 3.321453,-8.060781" />
+    </g>
+  </g>
+</svg>

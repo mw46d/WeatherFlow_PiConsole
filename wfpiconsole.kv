@@ -202,8 +202,8 @@ ScreenManager:
         source: 'icons/station/' + ('green' if 'stationUsed' in app.MetData and app.MetData['stationUsed'] else ('yellow' if 'stationOnline' in app.MetData and app.MetData['stationOnline'] else ('red' if 'stationOnline' in app.MetData and not app.MetData['stationOnline'] else 'blank'))) + '.png'
         keep_ratio: 0
         allow_stretch: 1
-        pos_hint: {'x': 243/262, 'y': 183/202}
-        size_hint: (16/262, 16/202)
+        pos_hint: {'x': 227/262, 'y': 167/202}
+        size_hint: (32/262, 32/202)
 
 <ForecastButton>:
     Button:
