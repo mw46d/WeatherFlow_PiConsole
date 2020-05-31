@@ -279,6 +279,8 @@ def ExtractWeatherFlow(metData, Config):
     try:
         wfDict = metData['Dict']['forecast']['hourly']
         wfDayDict = metData['Dict']['forecast']['daily'][0]
+        metData['stationOnline'] = metData['Dict']['station']['is_station_online']
+        metData['stationUsed'] = metData['Dict']['station']['includes_tempest']
     except KeyError:
         metData['Time']    = Now
         metData['Temp']    = '--'

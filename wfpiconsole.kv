@@ -61,6 +61,16 @@ ScreenManager:
     size_hint: (None,None)
     color: [0.84,0.84,0.84,1]
 
+<TinyText@Label>
+    font_name: 'fonts/Helvetica.ttf'
+    font_size: '11sp'
+    text_size: self.size
+    markup: 1
+    valign: 'center'
+    halign: 'center'
+    size_hint: (None,None)
+    color: [0.84,0.84,0.84,1]
+
 <BoldText@Label>
     font_name: 'fonts/SystemSanFranciscoDisplayBold.ttf'
     font_size: '13sp'
@@ -153,6 +163,12 @@ ScreenManager:
         pos_hint: {'x': 6/262, 'y': 134/202}
         size_hint: (170/262, 31/202)
 
+    TinyText:
+        text: ('[color=00a4b4ff] ' + app.MetData['TempMin'][0] + app.MetData['TempMin'][1] + '[/color]      [color=f05e40ff]' + app.MetData['TempMax'][0] + app.MetData['TempMax'][1] + '[/color]') if 'TempMin' in app.MetData != '--' else ''
+        halign: 'left'
+        pos_hint: {'x': 6/262, 'y': 121/202}
+        size_hint: (131/262, 22/202)
+
     ## Forecast precipitation
     LargeText:
         text: app.MetData['Precip'] + ' %'
@@ -181,6 +197,13 @@ ScreenManager:
         allow_stretch: 1
         pos_hint: {'x': 123/262, 'y': 58/202}
         size_hint: (115/262, 115/202)
+
+    Image:
+        source: 'icons/station/' + ('green' if 'stationUsed' in app.MetData and app.MetData['stationUsed'] else ('yellow' if 'stationOnline' in app.MetData and app.MetData['stationOnline'] else ('red' if 'stationOnline' in app.MetData and not app.MetData['stationOnline'] else 'blank'))) + '.png'
+        keep_ratio: 0
+        allow_stretch: 1
+        pos_hint: {'x': 243/262, 'y': 183/202}
+        size_hint: (16/262, 16/202)
 
 <ForecastButton>:
     Button:
