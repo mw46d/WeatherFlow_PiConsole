@@ -34,6 +34,7 @@ else:
 # Import required modules
 import configparser
 import os
+import subprocess
 
 # Load config file
 config = configparser.ConfigParser()
@@ -466,6 +467,14 @@ class wfpiconsole(App):
         if self.Astro['Reformat'] and Now.replace(second=0).time() == time(0,0,0):
             self.Astro = astro.Format(self.Astro,self.config,"Sun")
             self.Astro = astro.Format(self.Astro,self.config,"Moon")
+
+    def reboot(self):
+        subprocess.call("sudo shutdown -r", shell = True)
+        self.stop()
+
+    def shutdown(self):
+        subprocess.call("sudo shutdown -h", shell = True)
+        self.stop()
 
 # ==============================================================================
 # CurrentConditions SCREEN CLASS

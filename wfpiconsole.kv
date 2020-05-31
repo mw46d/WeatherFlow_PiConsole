@@ -980,15 +980,30 @@ ScreenManager:
 <Credits>:
     background_color: [0,0,0,0.8]
     size_hint: (500/800,400/480)
-    Image:
-        source: 'background/credits.png'
-        keep_ratio: 0
-        allow_stretch: 1
-    RelativeLayout:
-        BoldText:
-            text: 'Console version: [color=9aba2fff]' + app.config['System']['Version'] + '[/color]'
-            size_hint: (1,0.1)
-            pos_hint: {'x': 0, 'y': 0.71}
+    BoxLayout:
+        orientation: 'vertical'
+        RelativeLayout:
+            Image:
+                source: 'background/credits.png'
+                keep_ratio: 1
+                allow_stretch: 1
+            BoldText:
+                text: 'Console version: [color=9aba2fff]' + app.config['System']['Version'] + '[/color]'
+                size_hint: (1,0.1)
+                pos_hint: {'x': 0, 'y': 0.71}
+        BoxLayout:
+            spacing: '4dp'
+            height: '30dp'
+            size_hint_y: None
+            pos_hint: {'x': 0/500, 'y': 30/400}
+            Button:
+                id: 'Reboot'
+                text: 'Reboot'
+                on_press: app.reboot()
+            Button:
+                id: 'Shutdown'
+                text: 'Shutdown'
+                on_press: app.shutdown()
 
 ## =============================================================================
 ## UPDATE NOTIFICATION
