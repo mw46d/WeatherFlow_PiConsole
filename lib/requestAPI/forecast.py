@@ -93,3 +93,26 @@ def darkSky(Config):
 
     # Return latest DarkSky hourly forecast
     return Response
+
+def weatherFlow(Config):
+
+    """ API Request for latest DarkSky hourly forecasr
+
+    INPUTS:
+        Config              Station configuration
+
+    OUTPUT:
+        Response            API response containing latest hourly forecast
+    """
+
+    # Download latest WeatherFlow hourly forecast
+    Template = 'https://swd.weatherflow.com/swd/rest/better_forecast?api_key={}&station_id={}&lat={}&lon={}'
+    URL = Template.format(Config['Keys']['WeatherFlow'], Config['Station']['StationID'], Config['Station']['Latitude'], Config['Station']['Longitude'])
+    try:
+        Response = requests.get(URL,timeout=int(Config['System']['Timeout']))
+    except Exception as e:
+        # print(e)
+        Response = None
+
+    # Return latest WeatherFlow hourly forecast
+    return Response

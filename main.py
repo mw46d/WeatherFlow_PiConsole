@@ -285,8 +285,11 @@ class wfpiconsole(App):
         if section == 'Units' and key in ['Temp','Wind']:
             if self.config['Station']['Country'] == 'GB':
                 forecast.ExtractMetOffice(self.MetData,self.config)
-            else:
+            elif self.config['Keys']['DarkSky']:
                 forecast.ExtractDarkSky(self.MetData,self.config)
+            else:
+                forecast.ExtractWeatherFlow(self.MetData,self.config)
+
             if key == 'Wind' and 'Dial' in self.Sager:
                 self.Sager['Dial']['Units'] = value
                 self.Sager['Forecast'] = sagerForecast.getForecast(self.Sager['Dial'])
@@ -442,14 +445,14 @@ class wfpiconsole(App):
 
         # At the top of each hour update the on-screen forecast for the Station
         # location
-        if self.config['Station']['Country'] == 'GB':
-            if Now.hour > self.MetData['Time'].hour or Now.date() > self.MetData['Time'].date():
+        if Now.hour > self.MetData['Time'].hour or Now.date() > self.MetData['Time'].date():
+            if self.config['Station']['Country'] == 'GB':
                 forecast.ExtractMetOffice(self.MetData,self.config)
-                self.MetData['Time'] = Now
-        elif self.config['Keys']['DarkSky']:
-            if Now.hour > self.MetData['Time'].hour or Now.date() > self.MetData['Time'].date():
+            elif self.config['Keys']['DarkSky']:
                 forecast.ExtractDarkSky(self.MetData,self.config)
-                self.MetData['Time'] = Now
+            else:
+                forecast.ExtractWeatherFlow(self.MetData, self.config)
+            self.MetData['Time'] = Now
 
         # Once dusk has passed, calculate new sunrise/sunset times
         if Now >= self.Astro['Dusk'][0]:
