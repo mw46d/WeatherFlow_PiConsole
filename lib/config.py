@@ -586,7 +586,8 @@ def defaultConfig():
                                                           ('Timezone',       {'Type': 'request', 'Source': 'station', 'Desc': 'station timezone'}),
                                                           ('Country',        {'Type': 'request', 'Source': 'GeoNames',  'Desc': 'station country'}),
                                                           ('ForecastLocn',   {'Type': 'request', 'Source': 'MetOffice', 'Desc': 'station forecast location'}),
-                                                          ('MetOfficeID',    {'Type': 'request', 'Source': 'MetOffice', 'Desc': 'station forecast ID'})])
+                                                          ('MetOfficeID',    {'Type': 'request', 'Source': 'MetOffice', 'Desc': 'station forecast ID'}),
+                                                          ('IndoorBME280Corr', {'Type': 'default', 'Value': '2.00',  'Desc': 'Correction factor for optional BME280 sensor'})])
     Default['Units'] =           collections.OrderedDict([('Description',    '  Observation units'),
                                                           ('Temp',           {'Type': 'request', 'Source': 'observation', 'Desc': 'station temperature units'}),
                                                           ('Pressure',       {'Type': 'request', 'Source': 'observation', 'Desc': 'station pressure units'}),

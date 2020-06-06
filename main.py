@@ -36,6 +36,10 @@ import configparser
 import os
 import subprocess
 
+from smbus2 import SMBus
+from bme280 import BME280
+import time as ttime
+
 # Load config file
 config = configparser.ConfigParser()
 config.read('wfpiconsole.ini')
@@ -251,6 +255,18 @@ class wfpiconsole(App):
         # Initialise websocket connection
         self.WebsocketConnect()
 
+        bus = SMBus(1)
+        self.bme280 = BME280(i2c_dev = bus)
+        try:
+            self.bme280.get_temperature()
+            self.bme280.get_pressure()
+            self.bme280.get_humidity()
+            self.avg_cpu_temp = self.get_cpu_temperature()
+            ttime.sleep(1.0)
+        except RuntimeError as re:
+            # No BME280 connected, so no point in considering it
+            self.bme280 = None
+
         # Check for latest version
         Clock.schedule_once(partial(system.checkVersion,self.Version,self.config,updateNotif))
 
@@ -444,6 +460,9 @@ class wfpiconsole(App):
         if (Now.minute,Now.second) == (5,0):
             forecast.Download(self.MetData,self.config)
 
+        if  not self.config['Station']['InAirID'] and self.bme280 != None and Now.second % 10 == 0:
+            self.UpdateIndoorCond(Now)
+
         # At the top of each hour update the on-screen forecast for the Station
         # location
         if Now.hour > self.MetData['Time'].hour or Now.date() > self.MetData['Time'].date():
@@ -475,6 +494,62 @@ class wfpiconsole(App):
     def shutdown(self):
         subprocess.call("sudo shutdown -h", shell = True)
         self.stop()
+
+    # Get the temperature of the CPU for compensation
+    def get_cpu_temperature(self):
+        with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
+            temp = f.read()
+            temp = int(temp) / 1000.0
+        return temp
+
+    def UpdateIndoorCond(self, now):
+        Time = [ int(ttime.mktime(now.timetuple())) ]
+
+        self.avg_cpu_temp = (self.avg_cpu_temp * 4.0 + self.get_cpu_temperature()) / 5.0
+
+        # Tuning factor for compensation. Decrease this number to adjust the
+        # temperature down, and increase to adjust up
+        # 2.25 -> 1.5C too much (at least)
+        # 1.80 -> 1.0 too low
+        factor = 2.00
+        factor = float(self.config['Station']['IndoorBME280Corr'])
+
+        raw_temp = self.bme280.get_temperature()
+        comp_temp = raw_temp - ((self.avg_cpu_temp - raw_temp) / factor)
+
+        inTemp = self.Obs['inTemp'][0]
+        if inTemp == None or inTemp == '--' or inTemp == '-':
+            Temp = [ comp_temp, 'c' ]
+        else:
+            Temp = [ (float(inTemp) * 4.0 + comp_temp) / 5.0, 'c' ]
+
+        # Pressure = (self.Obs['inPressure'] * 4.0 + self.bme280.get_pressure()) / 5.0
+        # Humidity = (self.Obs['inHumidity'] * 4.0 + self.bme280.humidity()) / 5.0
+
+        # Extract required derived observations
+        minTemp = self.Obs['inTempMin']
+        maxTemp = self.Obs['inTempMax']
+
+        if minTemp == None or minTemp == '---':
+            minTemp = [ 100.0, 'c', None, 100.0, datetime(1970, 1, 1, tzinfo = pytz.utc) ]
+
+        if maxTemp == None or maxTemp == '---':
+            maxTemp = [ -10.0, 'c', None, -10.0, datetime(1970, 1, 1, tzinfo = pytz.utc) ]
+
+        # Calculate derived variables from indoor AIR observations
+        MaxTemp, MinTemp = derive.TempMaxMin(Time, Temp, maxTemp, minTemp, None, self.config, False)
+
+        # Convert observation units as required
+        Temp    = observation.Units(Temp,   self.config['Units']['Temp'])
+        MaxTemp = observation.Units(MaxTemp,self.config['Units']['Temp'])
+        MinTemp = observation.Units(MinTemp,self.config['Units']['Temp'])
+
+        self.Obs['inTemp']    = observation.Format(Temp,   'Temp')
+        self.Obs['inTempMax'] = observation.Format(MaxTemp,'Temp')
+        self.Obs['inTempMin'] = observation.Format(MinTemp,'Temp')
+
+
+
 
 # ==============================================================================
 # CurrentConditions SCREEN CLASS
