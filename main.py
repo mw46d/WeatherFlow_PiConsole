@@ -503,14 +503,6 @@ class wfpiconsole(App):
             self.Astro = astro.Format(self.Astro,self.config,"Sun")
             self.Astro = astro.Format(self.Astro,self.config,"Moon")
 
-    def reboot(self):
-        subprocess.call("sudo shutdown -r", shell = True)
-        self.stop()
-
-    def shutdown(self):
-        subprocess.call("sudo shutdown -h", shell = True)
-        self.stop()
-
     # Get the temperature of the CPU for compensation
     def get_cpu_temperature(self):
         with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
