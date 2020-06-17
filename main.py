@@ -649,7 +649,7 @@ class DailyForecast(Screen):
         forecast.ExtractDailyWeatherFlow(app.MetData, app.DailyForecast, app.config)
 
     def on_enter(self):
-        Clock.schedule_once(self.change_screen_back, 10)
+        Clock.schedule_once(self.change_screen_back, 60)
 
     def change_screen_back(self, dt):
         self.manager.current = 'CurrentConditions'
