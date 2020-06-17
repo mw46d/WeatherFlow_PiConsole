@@ -141,7 +141,7 @@ class WeatherFlowClientFactory(WebSocketClientFactory,ReconnectingClientFactory)
 # ==============================================================================
 from kivy.core.window import Window
 from kivy.properties  import DictProperty, NumericProperty, ConfigParserProperty
-from kivy.properties  import StringProperty
+from kivy.properties  import ListProperty, StringProperty
 from kivy.animation   import Animation
 from kivy.factory     import Factory
 from kivy.metrics     import dp
@@ -258,7 +258,7 @@ class wfpiconsole(App):
         # MetOffice or DarkSky weather forecast
         astro.SunriseSunset(self.Astro,self.config)
         astro.MoonriseMoonset(self.Astro,self.config)
-        forecast.Download(self.MetData,self.config)
+        forecast.Download(self.MetData, self.DailyForecast, self.config)
 
         # Generate Sager Weathercaster forecast
         Thread(target=sagerForecast.Generate, args=(self.Sager,self.config), name="Sager", daemon=True).start()
@@ -322,6 +322,7 @@ class wfpiconsole(App):
                 forecast.ExtractDarkSky(self.MetData,self.config)
             else:
                 forecast.ExtractWeatherFlow(self.MetData,self.config)
+                forecast.ExtractDailyWeatherFlow(self.MetData, self.DailyForecast, self.config)
 
             if key == 'Wind' and 'Dial' in self.Sager:
                 self.Sager['Dial']['Units'] = value
@@ -375,6 +376,8 @@ class wfpiconsole(App):
                     self.CurrentConditions.ids[Button[ii]].add_widget(eval(Type + 'Button')())
                     self.CurrentConditions.buttonList.append([Button[ii],Panel,Type,'Primary'])
                     ii += 1
+
+            self.CurrentConditions.ids['ButtonSix'].add_widget(DailyForecastButton())
 
             # Change 'None' for secondary panel selection to blank in config
             # file
@@ -488,6 +491,7 @@ class wfpiconsole(App):
                 forecast.ExtractDarkSky(self.MetData,self.config)
             else:
                 forecast.ExtractWeatherFlow(self.MetData, self.config)
+                forecast.ExtractDailyWeatherFlow(self.MetData, self.DailyForecast, self.config)
             self.MetData['Time'] = Now
 
         # Once dusk has passed, calculate new sunrise/sunset times
@@ -557,8 +561,6 @@ class wfpiconsole(App):
         self.Obs['inTempMin'] = observation.Format(MinTemp,'Temp')
 
 
-
-
 # ==============================================================================
 # CurrentConditions SCREEN CLASS
 # ==============================================================================
@@ -588,6 +590,8 @@ class CurrentConditions(Screen):
                 self.manager.ids.CurrentConditions.ids[Button[ii]].add_widget(eval(Type + 'Button')())
                 self.buttonList.append([Button[ii],Panel,Type,'Primary'])
                 ii += 1
+
+        self.ids['ButtonSix'].add_widget(DailyForecastButton())
 
     # SWITCH BETWEEN DIFFERENT PANELS ON CURRENT CONDITIONS SCREEN
     # --------------------------------------------------------------------------
@@ -625,6 +629,44 @@ class CurrentConditions(Screen):
             App.get_running_app().CurrentConditions.buttonList[ii] = [Button[0],Button[1],newButton,'Secondary']
         elif Button[3] == 'Secondary':
             App.get_running_app().CurrentConditions.buttonList[ii] = [Button[0],Button[1],newButton,'Primary']
+
+class DailyForecast(Screen):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_once(self.AddPanels)
+        App.get_running_app().DailyForecast = self
+        self.panels = []
+
+    def AddPanels(self, dt):
+        PanelIds = [ 'DF' + Num for Num in ['One','Two','Three','Four','Five','Six', 'Seven', 'Eight', 'Nine', 'Ten' ]]
+        app = App.get_running_app()
+
+        for i in range(10):
+            p = DailyForecastPanel(i)
+            self.manager.ids.DailyForecast.ids[PanelIds[i]].add_widget(p)
+            self.panels.append(p)
+
+        forecast.ExtractDailyWeatherFlow(app.MetData, app.DailyForecast, app.config)
+
+    def on_enter(self):
+        Clock.schedule_once(self.change_screen_back, 10)
+
+    def change_screen_back(self, dt):
+        self.manager.current = 'CurrentConditions'
+
+class DailyForecastPanel(RelativeLayout):
+    date = StringProperty('')
+    precip = ListProperty([ '0', ' %' ])
+    tempMin = ListProperty([ '0', '' ])
+    tempMax = ListProperty([ '0', '' ])
+    weather = StringProperty('ForecastUnavailable')
+
+    def __init__(self, i, **kwargs):
+        self.index = i
+        super(DailyForecastPanel, self).__init__(**kwargs)
+
+class DailyForecastButton(RelativeLayout):
+    pass
 
 # ==============================================================================
 # ForecastPanel RELATIVE LAYOUT CLASS

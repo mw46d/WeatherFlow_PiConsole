@@ -24,10 +24,14 @@
 ## SCREEN MANAGER
 ## =============================================================================
 ScreenManager:
+    id: ScreenManager
     transition: NoTransition()
     CurrentConditions:
         id: CurrentConditions
         name: 'CurrentConditions'
+    DailyForecast:
+        id: DailyForecast
+        name: 'DailyForecast'
 
 ## =============================================================================
 ## CUSTOM Label
@@ -175,6 +179,44 @@ ScreenManager:
                     background_down: 'buttons/mainMenuPressed.png'
                     on_release: Factory.mainMenu().open()
 
+<DailyForecast>:
+    name: 'DailyForecast'
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: ['2dp', '2dp', '2dp', '2dp']
+        spacing: '4dp'
+        orientation: 'vertical'
+        BoxLayout:
+            spacing: '4dp'
+            BoxLayout:
+                id: DFOne
+            BoxLayout:
+                id: DFTwo
+            BoxLayout:
+                id: DFThree
+            BoxLayout:
+                id: DFFour
+            BoxLayout:
+                id: DFFive
+        BoxLayout:
+            spacing: '4dp'
+            BoxLayout:
+                id: DFSix
+            BoxLayout:
+                id: DFSeven
+            BoxLayout:
+                id: DFEight
+            BoxLayout:
+                id: DFNine
+            BoxLayout:
+                id: DFTen
+
 ## =============================================================================
 ## METOFFICE/DARKSKY FORECAST PANEL AND BUTTON
 ## =============================================================================
@@ -241,6 +283,56 @@ ScreenManager:
         background_down: 'buttons/forecastPressed.png'
         on_release: app.CurrentConditions.SwitchPanel(self)
 
+# x: 156  y: 236
+<DailyForecastPanel>:
+    SmallText:
+        text: 'Today' if root.index == 0 else root.date
+        halign: 'center'
+        pos_hint: {'x': 6/156, 'y': 186/236}
+        size_hint: (145/156, 22/236)
+
+    ## Current weather icon
+    Image:
+        source: 'icons/weather/' + root.weather + '.png'
+        keep_ratio: 0
+        allow_stretch: 1
+        pos_hint: {'x': 20/156, 'y': 68/236}
+        size_hint: (115/156, 115/236)
+
+    SmallText:
+        # text: '56789C0123456789'
+        text: 'Temp: [color=00a4b4ff]' + root.tempMin[0] + root.tempMin[1] + '[/color] / [color=f05e40ff]' + root.tempMax[0] + root.tempMax[1] + '[/color]'
+        halign: 'left'
+        pos_hint: {'x': 6/156, 'y': 46/236}
+        size_hint: (144/156, 22/236)
+
+    SmallText:
+        text: 'Prec: ' + root.precip[0] + root.precip[1]
+        halign: 'left'
+        pos_hint: {'x': 6/156, 'y': 25/236}
+        size_hint: (131/156, 22/236)
+
+    Image:
+        source: 'icons/station/' + (('green' if 'stationUsed' in app.MetData and app.MetData['stationUsed'] else ('yellow' if 'stationOnline' in app.MetData and app.MetData['stationOnline'] else ('red' if 'stationOnline' in app.MetData and not app.MetData['stationOnline'] else 'blank'))) if root.index == 0 else 'blank') + '.png'
+        keep_ratio: 0
+        allow_stretch: 1
+        pos_hint: {'x': 120/156, 'y': 167/236}
+        size_hint: (32/156, 32/236)
+
+<DailyForecastButton>:
+    Button:
+        id: 'DailyForecastButton'
+        background_normal: 'buttons/dailyForecast.png'
+        background_down: 'buttons/dailyForecastPressed.png'
+        on_release: app.root.current = 'DailyForecast'
+
+## =============================================================================
+## SAGER FORECAST PANEL AND BUTTON
+## =============================================================================
+<SagerPanel>:
+    Image:
+        source: 'background/sagerForecast.png'
+        size_hint: (1,1)
 ## =============================================================================
 ## SAGER FORECAST PANEL AND BUTTON
 ## =============================================================================

@@ -27,7 +27,7 @@ import bisect
 import pytz
 import time
 
-def Download(metData,Config):
+def Download(metData, dailyForecast, Config):
 
     """ Download the weather forecast from either the UK MetOffice or
     DarkSky
@@ -83,6 +83,7 @@ def Download(metData,Config):
             if not 'Dict' in metData:
                 metData['Dict'] = {}
         ExtractWeatherFlow(metData,Config)
+        ExtractDailyWeatherFlow(metData, dailyForecast, Config)
 
     # Return metData dictionary
     return metData
@@ -257,7 +258,6 @@ def ExtractDarkSky(metData,Config):
     return metData
 
 def ExtractWeatherFlow(metData, Config):
-
     """ Parse the weather forecast from DarkSky
 
     INPUTS:
@@ -358,3 +358,67 @@ def ExtractWeatherFlow(metData, Config):
 
     # Return metData dictionary
     return metData
+
+def ExtractDailyWeatherFlow(metData, dailyForecast, Config):
+    """
+    INPUTS:
+        metData             Dictionary holding weather forecast data
+        dailyForecast       screen with array of panels
+        Config              Station configuration
+    """
+
+    # Get current time in station time zone
+    Tz = pytz.timezone(Config['Station']['Timezone'])
+    Now = datetime.now(pytz.utc).astimezone(Tz)
+
+    for i in range(len(dailyForecast.panels)):
+        d = {}
+        try:
+            wfDayDict = metData['Dict']['forecast']['daily'][i]
+
+            # Extract weather variables from WeatherFlow forecast
+            date    = "%02d/%02d" % (wfDayDict['month_num'], wfDayDict['day_num'])
+            tempMax = [wfDayDict['air_temp_high'], 'c']
+            tempMin = [wfDayDict['air_temp_low'], 'c']
+            precip  = [wfDayDict['precip_probability'], '%']
+            weather =  wfDayDict['icon']
+        except KeyError:
+            date    = '0/0'
+            tempMax = [ 0, 'c']
+            tempMin = [ 0, 'c']
+            precip  = [ 0, '%']
+            weather = 'XX'
+
+        # Convert forecast units as required
+        tempMax = observation.Units(tempMax, Config['Units']['Temp'])
+        tempMin = observation.Units(tempMin, Config['Units']['Temp'])
+
+        dailyForecast.panels[i].date = date
+        dailyForecast.panels[i].tempMax = ['{:.0f}'.format(tempMax[0]), tempMax[1]]
+        dailyForecast.panels[i].tempMin = ['{:.0f}'.format(tempMin[0]), tempMin[1]]
+        dailyForecast.panels[i].precip =  ['{:.0f}'.format(precip[0]), ' %']
+
+        # Define weather icon
+        if weather == 'clear-day':
+            dailyForecast.panels[i].weather = '1'
+        elif weather == 'clear-night':
+            dailyForecast.panels[i].weather = '0'
+        elif weather == 'rain':
+            dailyForecast.panels[i].weather = '12'
+        elif weather == 'snow':
+            dailyForecast.panels[i].weather = '27'
+        elif weather == 'sleet':
+            dailyForecast.panels[i].weather = '18'
+        elif weather == 'wind':
+            dailyForecast.panels[i].weather = 'wind'
+        elif weather == 'fog':
+            dailyForecast.panels[i].weather = '6'
+        elif weather == 'cloudy':
+            dailyForecast.panels[i].weather = '7'
+        elif weather == 'partly-cloudy-day':
+            dailyForecast.panels[i].weather = '3'
+        elif weather == 'partly-cloudy-night':
+            dailyForecast.panels[i].weather = '2'
+        else:
+            dailyForecast.panels[i].weather = 'ForecastUnavailable'
+
