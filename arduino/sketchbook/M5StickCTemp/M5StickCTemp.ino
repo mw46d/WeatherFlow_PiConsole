@@ -150,16 +150,18 @@ void loop(void) {
 
   if (start_t - last_display_time > 10000) {
     last_display_time = start_t;
-    
+
+    /*
     Serial.print("temp: "); Serial.print(tmp); Serial.print("  "); Serial.print(avg_temp); Serial.print("   "); Serial.println(temp_corr(avg_temp));
     Serial.print("hum : "); Serial.print(hum); Serial.print("  "); Serial.println(avg_hum);
     Serial.print("vbat: "); Serial.print(M5.Axp.GetBatVoltage());
     Serial.print("  aps: "); Serial.print(M5.Axp.GetAPSVoltage());
     Serial.print("  level: "); Serial.print(M5.Axp.GetWarningLevel());
     Serial.print("  axp_temp: "); Serial.println(M5.Axp.GetTempInAXP192());
+    */
 
     M5.Lcd.setCursor(0, 40, 2);
-    M5.Lcd.printf("Temp: %.1f Humi: %.1f%%", avg_temp, avg_hum);
+    M5.Lcd.printf("Temp: %.1f Humi: %.1f%%", temp_corr(avg_temp), avg_hum);
     M5.Lcd.setCursor(0, 60, 2);
     M5.Lcd.printf("Pressure: %.1f", avg_pressure / 100.0);
   }
