@@ -27,7 +27,9 @@ import bisect
 import pytz
 import time
 
-def Download(metData, dailyForecast, Config):
+def Download(app):
+    metData = app.MetData;
+    Config = app.config;
 
     """ Download the weather forecast from either the UK MetOffice or
     DarkSky
@@ -51,10 +53,10 @@ def Download(metData, dailyForecast, Config):
         if requestAPI.forecast.verifyResponse(Data,'SiteRep'):
             metData['Dict'] = Data.json()
         else:
-            Clock.schedule_once(lambda dt: Download(metData,Config),600)
+            Clock.schedule_once(lambda dt: Download(app), 600)
             if not 'Dict' in metData:
                 metData['Dict'] = {}
-        ExtractMetOffice(metData,Config)
+        ExtractMetOffice(app)
 
     # If station is located outside of Great Britain, download the latest
     # DarkSky hourly forecast
@@ -67,10 +69,10 @@ def Download(metData, dailyForecast, Config):
         if requestAPI.forecast.verifyResponse(Data,'hourly'):
             metData['Dict'] = Data.json()
         else:
-            Clock.schedule_once(lambda dt: Download(metData,Config),600)
+            Clock.schedule_once(lambda dt: Download(app), 600)
             if not 'Dict' in metData:
                 metData['Dict'] = {}
-        ExtractDarkSky(metData,Config)
+        ExtractDarkSky(app)
     elif Config['Station']['StationID']:
         # Download latest three-hourly forecast
         Data = requestAPI.forecast.weatherFlow(Config)
@@ -79,16 +81,18 @@ def Download(metData, dailyForecast, Config):
         if requestAPI.forecast.verifyResponse(Data,'forecast'):
             metData['Dict'] = Data.json()
         else:
-            Clock.schedule_once(lambda dt: Download(metData,Config),600)
+            Clock.schedule_once(lambda dt: Download(app), 600)
             if not 'Dict' in metData:
                 metData['Dict'] = {}
-        ExtractWeatherFlow(metData,Config)
-        ExtractDailyWeatherFlow(metData, dailyForecast, Config)
+        ExtractWeatherFlow(app)
+        ExtractDailyWeatherFlow(app)
 
     # Return metData dictionary
     return metData
 
-def ExtractMetOffice(metData,Config):
+def ExtractMetOffice(app):
+    metData = app.MetData
+    Config = app.config
 
     """ Parse the weather forecast from the UK MetOffice
 
@@ -121,7 +125,7 @@ def ExtractMetOffice(metData,Config):
 
         # Attempt to download forecast again in 10 minutes and return
         # metData dictionary
-        Clock.schedule_once(lambda dt: Download(metData,Config),600)
+        Clock.schedule_once(lambda dt: Download(app), 600)
         return metData
 
     # Extract date of all available forecasts, and retrieve forecast for
@@ -163,7 +167,9 @@ def ExtractMetOffice(metData,Config):
     # Return metData dictionary
     return metData
 
-def ExtractDarkSky(metData,Config):
+def ExtractDarkSky(app):
+    metData = app.MetData
+    Config = app.config
 
     """ Parse the weather forecast from DarkSky
 
@@ -196,7 +202,7 @@ def ExtractDarkSky(metData,Config):
 
         # Attempt to download forecast again in 10 minutes and return
         # metData dictionary
-        Clock.schedule_once(lambda dt: Download(metData,Config),600)
+        Clock.schedule_once(lambda dt: Download(app), 600)
         return metData
 
     # Extract 'valid from' time of all available hourly forecasts, and
@@ -257,7 +263,9 @@ def ExtractDarkSky(metData,Config):
     # Return metData dictionary
     return metData
 
-def ExtractWeatherFlow(metData, Config):
+def ExtractWeatherFlow(app):
+    metData = app.MetData
+    Config = app.config
     """ Parse the weather forecast from DarkSky
 
     INPUTS:
@@ -292,7 +300,7 @@ def ExtractWeatherFlow(metData, Config):
 
         # Attempt to download forecast again in 10 minutes and return
         # metData dictionary
-        Clock.schedule_once(lambda dt: Download(metData, Config), 600)
+        Clock.schedule_once(lambda dt: Download(app), 600)
         return metData
 
     # Extract 'valid from' time of all available hourly forecasts, and
@@ -359,7 +367,10 @@ def ExtractWeatherFlow(metData, Config):
     # Return metData dictionary
     return metData
 
-def ExtractDailyWeatherFlow(metData, dailyForecast, Config):
+def ExtractDailyWeatherFlow(app):
+    metData = app.MetData
+    dailyForecast = app.DailyForecast
+    Config = app.config
     """
     INPUTS:
         metData             Dictionary holding weather forecast data

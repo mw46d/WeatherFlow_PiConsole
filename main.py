@@ -258,7 +258,7 @@ class wfpiconsole(App):
         # MetOffice or DarkSky weather forecast
         astro.SunriseSunset(self.Astro,self.config)
         astro.MoonriseMoonset(self.Astro,self.config)
-        forecast.Download(self.MetData, self.DailyForecast, self.config)
+        forecast.Download(self)
 
         # Generate Sager Weathercaster forecast
         Thread(target=sagerForecast.Generate, args=(self.Sager,self.config), name="Sager", daemon=True).start()
@@ -317,12 +317,12 @@ class wfpiconsole(App):
         # temperature or wind speed units are changed
         if section == 'Units' and key in ['Temp','Wind']:
             if self.config['Station']['Country'] == 'GB':
-                forecast.ExtractMetOffice(self.MetData,self.config)
+                forecast.ExtractMetOffice(self)
             elif self.config['Keys']['DarkSky']:
-                forecast.ExtractDarkSky(self.MetData,self.config)
+                forecast.ExtractDarkSky(self)
             else:
-                forecast.ExtractWeatherFlow(self.MetData,self.config)
-                forecast.ExtractDailyWeatherFlow(self.MetData, self.DailyForecast, self.config)
+                forecast.ExtractWeatherFlow(self)
+                forecast.ExtractDailyWeatherFlow(self)
 
             if key == 'Wind' and 'Dial' in self.Sager:
                 self.Sager['Dial']['Units'] = value
@@ -477,7 +477,7 @@ class wfpiconsole(App):
         # At 5 minutes past each hour, download a new forecast for the Station
         # location
         if (Now.minute,Now.second) == (5,0):
-            forecast.Download(self.MetData,self.config)
+            forecast.Download(self)
 
         if  not self.config['Station']['InAirID'] and self.bme280 != None and Now.second % 10 == 0:
             self.UpdateIndoorCond(Now)
@@ -486,12 +486,12 @@ class wfpiconsole(App):
         # location
         if Now.hour > self.MetData['Time'].hour or Now.date() > self.MetData['Time'].date():
             if self.config['Station']['Country'] == 'GB':
-                forecast.ExtractMetOffice(self.MetData,self.config)
+                forecast.ExtractMetOffice(self)
             elif self.config['Keys']['DarkSky']:
-                forecast.ExtractDarkSky(self.MetData,self.config)
+                forecast.ExtractDarkSky(self)
             else:
-                forecast.ExtractWeatherFlow(self.MetData, self.config)
-                forecast.ExtractDailyWeatherFlow(self.MetData, self.DailyForecast, self.config)
+                forecast.ExtractWeatherFlow(self)
+                forecast.ExtractDailyWeatherFlow(self)
             self.MetData['Time'] = Now
 
         # Once dusk has passed, calculate new sunrise/sunset times
@@ -646,7 +646,7 @@ class DailyForecast(Screen):
             self.manager.ids.DailyForecast.ids[PanelIds[i]].add_widget(p)
             self.panels.append(p)
 
-        forecast.ExtractDailyWeatherFlow(app.MetData, app.DailyForecast, app.config)
+        forecast.ExtractDailyWeatherFlow(app)
 
     def on_enter(self):
         Clock.schedule_once(self.change_screen_back, 60)
