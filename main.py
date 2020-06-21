@@ -660,6 +660,7 @@ class DailyForecastPanel(RelativeLayout):
     tempMin = ListProperty([ '0', '' ])
     tempMax = ListProperty([ '0', '' ])
     weather = StringProperty('ForecastUnavailable')
+    weekday = StringProperty('XMas')
 
     def __init__(self, i, **kwargs):
         self.index = i

@@ -26,6 +26,7 @@ import requests
 import bisect
 import pytz
 import time
+import calendar
 
 def Download(app):
     metData = app.MetData;
@@ -381,6 +382,7 @@ def ExtractDailyWeatherFlow(app):
     # Get current time in station time zone
     Tz = pytz.timezone(Config['Station']['Timezone'])
     Now = datetime.now(pytz.utc).astimezone(Tz)
+    weekdays = [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun' ]
 
     for i in range(len(dailyForecast.panels)):
         d = {}
@@ -393,12 +395,15 @@ def ExtractDailyWeatherFlow(app):
             tempMin = [wfDayDict['air_temp_low'], 'c']
             precip  = [wfDayDict['precip_probability'], '%']
             weather =  wfDayDict['icon']
+            dt = datetime.fromtimestamp(wfDayDict['sunrise'], Tz)
+            weekday = calendar.weekday(dt.year, wfDayDict['month_num'], wfDayDict['day_num'])
         except KeyError:
             date    = '0/0'
             tempMax = [ 0, 'c']
             tempMin = [ 0, 'c']
             precip  = [ 0, '%']
             weather = 'XX'
+            weekday = 0
 
         # Convert forecast units as required
         tempMax = observation.Units(tempMax, Config['Units']['Temp'])
@@ -408,6 +413,7 @@ def ExtractDailyWeatherFlow(app):
         dailyForecast.panels[i].tempMax = ['{:.0f}'.format(tempMax[0]), tempMax[1]]
         dailyForecast.panels[i].tempMin = ['{:.0f}'.format(tempMin[0]), tempMin[1]]
         dailyForecast.panels[i].precip =  ['{:.0f}'.format(precip[0]), ' %']
+        dailyForecast.panels[i].weekday = weekdays[weekday]
 
         # Define weather icon
         if weather == 'clear-day':

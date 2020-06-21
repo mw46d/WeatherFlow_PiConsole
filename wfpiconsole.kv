@@ -285,8 +285,14 @@ ScreenManager:
 
 # x: 156  y: 236
 <DailyForecastPanel>:
+    Image:
+        source: 'background/daily' + ('WE' if root.weekday in [ 'Sat', 'Sun' ] else '') + '.png'
+        size_hint: (1,1)
+        keep_ratio: 0
+        allow_stretch: 1
+
     SmallText:
-        text: 'Today' if root.index == 0 else root.date
+        text: root.weekday + ' ' + ('Today' if root.index == 0 else root.date)
         halign: 'center'
         pos_hint: {'x': 6/156, 'y': 186/236}
         size_hint: (145/156, 22/236)
@@ -326,13 +332,6 @@ ScreenManager:
         background_down: 'buttons/dailyForecastPressed.png'
         on_release: app.root.current = 'DailyForecast'
 
-## =============================================================================
-## SAGER FORECAST PANEL AND BUTTON
-## =============================================================================
-<SagerPanel>:
-    Image:
-        source: 'background/sagerForecast.png'
-        size_hint: (1,1)
 ## =============================================================================
 ## SAGER FORECAST PANEL AND BUTTON
 ## =============================================================================
