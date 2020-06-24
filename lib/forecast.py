@@ -397,6 +397,13 @@ def ExtractDailyWeatherFlow(app):
             weather =  wfDayDict['icon']
             dt = datetime.fromtimestamp(wfDayDict['sunrise'], Tz)
             weekday = calendar.weekday(dt.year, wfDayDict['month_num'], wfDayDict['day_num'])
+        except IndexError:
+            date    = '0/0'
+            tempMax = [ 0, 'c']
+            tempMin = [ 0, 'c']
+            precip  = [ 0, '%']
+            weather = 'XX'
+            weekday = 0
         except KeyError:
             date    = '0/0'
             tempMax = [ 0, 'c']
