@@ -43,11 +43,11 @@ def Download(app):
     """
 
     # Download latest three-hourly forecast
-    Data = requestAPI.forecast.weatherFlow(Config)
+    Data = requestAPI.weatherflow.Forecast(Config)
 
     # Verify API response and extract forecast
-    if requestAPI.forecast.verifyResponse(Data,'forecast'):
-        metData['Dict'] = Data.json()['forecast']
+    if requestAPI.weatherflow.verifyResponse(Data,'forecast'):
+        metData['Dict'] = Data.json()
     else:
         Clock.schedule_once(lambda dt: Download(app), 600)
         if not 'Dict' in metData:
@@ -81,8 +81,8 @@ def Extract(app):
     # forecast is unavailable
     Tz = pytz.timezone(Config['Station']['Timezone'])
     try:
-        wfDict = metData['Dict']['hourly']
-        wfDayDict = metData['Dict']['daily'][0]
+        wfDict = metData['Dict']['forecast']['hourly']
+        wfDayDict = metData['Dict']['forecast']['daily'][0]
         metData['stationOnline'] = metData['Dict']['station']['is_station_online']
         metData['stationUsed'] = metData['Dict']['station']['includes_tempest']
     except KeyError:
@@ -182,7 +182,7 @@ def ExtractDaily(app):
     for i in range(len(dailyForecast.panels)):
         d = {}
         try:
-            wfDayDict = metData['Dict']['daily'][i]
+            wfDayDict = metData['Dict']['forecast']['daily'][i]
 
             # Extract weather variables from WeatherFlow forecast
             date    = "%02d/%02d" % (wfDayDict['month_num'], wfDayDict['day_num'])

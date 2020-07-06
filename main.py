@@ -636,7 +636,7 @@ class DailyForecast(Screen):
             self.manager.ids.DailyForecast.ids[PanelIds[i]].add_widget(p)
             self.panels.append(p)
 
-        forecast.ExtractDailyWeatherFlow(app)
+        forecast.ExtractDaily(app)
 
     def on_enter(self):
         Clock.schedule_once(self.change_screen_back, 60)
