@@ -1,6 +1,5 @@
-""" Returns the UK MetOffice or DarkSky forecast variables required by the
-Raspberry Pi Python console for WeatherFlow Tempest and Smart Home Weather
-stations.
+""" Returns the WeatherFlow forecast variables required by the Raspberry Pi
+Python console for WeatherFlow Tempest and Smart Home Weather stations.
 Copyright (C) 2018-2020 Peter Davis
 
 This program is free software: you can redistribute it and/or modify it under
@@ -32,8 +31,8 @@ def Download(app):
     metData = app.MetData;
     Config = app.config;
 
-    """ Download the weather forecast from either the UK MetOffice or
-    DarkSky
+    """ Download the weather forecast data using the WeatherFlow BetterForecast
+    API
 
     INPUTS:
         metData             Dictionary holding weather forecast data
@@ -43,228 +42,24 @@ def Download(app):
         metData             Dictionary holding weather forecast data
     """
 
-    # If Station is located in Great Britain, download latest
-    # MetOffice three-hourly forecast
-    if Config['Station']['Country'] == 'GB':
+    # Download latest three-hourly forecast
+    Data = requestAPI.forecast.weatherFlow(Config)
 
-        # Download latest three-hourly forecast
-        Data = requestAPI.forecast.metOffice(Config)
-
-        # Verify API response and extract forecast
-        if requestAPI.forecast.verifyResponse(Data,'SiteRep'):
-            metData['Dict'] = Data.json()
-        else:
-            Clock.schedule_once(lambda dt: Download(app), 600)
-            if not 'Dict' in metData:
-                metData['Dict'] = {}
-        ExtractMetOffice(app)
-
-    # If station is located outside of Great Britain, download the latest
-    # DarkSky hourly forecast
-    elif Config['Keys']['DarkSky']:
-
-        # Download latest three-hourly forecast
-        Data = requestAPI.forecast.darkSky(Config)
-
-        # Verify API response and extract forecast
-        if requestAPI.forecast.verifyResponse(Data,'hourly'):
-            metData['Dict'] = Data.json()
-        else:
-            Clock.schedule_once(lambda dt: Download(app), 600)
-            if not 'Dict' in metData:
-                metData['Dict'] = {}
-        ExtractDarkSky(app)
-    elif Config['Station']['StationID']:
-        # Download latest three-hourly forecast
-        Data = requestAPI.forecast.weatherFlow(Config)
-
-        # Verify API response and extract forecast
-        if requestAPI.forecast.verifyResponse(Data,'forecast'):
-            metData['Dict'] = Data.json()
-        else:
-            Clock.schedule_once(lambda dt: Download(app), 600)
-            if not 'Dict' in metData:
-                metData['Dict'] = {}
-        ExtractWeatherFlow(app)
-        ExtractDailyWeatherFlow(app)
-
-    # Return metData dictionary
-    return metData
-
-def ExtractMetOffice(app):
-    metData = app.MetData
-    Config = app.config
-
-    """ Parse the weather forecast from the UK MetOffice
-
-    INPUTS:
-        metData             Dictionary holding weather forecast data
-        Config              Station configuration
-
-    OUTPUT:
-        metData             Dictionary holding weather forecast data
-    """
-
-    # Get current time in station time zone
-    Tz = pytz.timezone(Config['Station']['Timezone'])
-    Now = datetime.now(pytz.utc).astimezone(Tz)
-
-    # Extract all forecast data from MetOffice JSON file. If  forecast is
-    # unavailable, set forecast variables to blank and indicate to user that
-    # forecast is unavailable
-    try:
-        Issued  = str(metData['Dict']['SiteRep']['DV']['dataDate'][11:-4])
-        metDict = (metData['Dict']['SiteRep']['DV']['Location']['Period'])
-    except KeyError:
-        metData['Time']    = Now
-        metData['Temp']    = '--'
-        metData['WindDir'] = '--'
-        metData['WindSpd'] = '--'
-        metData['Weather'] = 'ForecastUnavailable'
-        metData['Precip']  = '--'
-        metData['Valid']   = '--'
-
-        # Attempt to download forecast again in 10 minutes and return
-        # metData dictionary
-        Clock.schedule_once(lambda dt: Download(app), 600)
-        return metData
-
-    # Extract date of all available forecasts, and retrieve forecast for
-    # today
-    Dates = list(item['value'] for item in metDict)
-    metDict = metDict[Dates.index(Now.strftime('%Y-%m-%dZ'))]['Rep']
-
-    # Extract 'valid from' time of all available three-hourly forecasts, and
-    # retrieve forecast for the current three-hour period
-    Times = list(int(item['$'])//60 for item in metDict)
-    metDict = metDict[bisect.bisect(Times,Now.hour)-1]
-
-    # Extract 'valid until' time for the retrieved forecast
-    Valid = Times[bisect.bisect(Times,Now.hour)-1] + 3
-    if Valid == 24:
-        Valid = 0
-
-    # Extract weather variables from MetOffice forecast
-    Temp    = [float(metDict['T']),'c']
-    WindSpd = [float(metDict['S'])/2.2369362920544,'mps']
-    WindDir = [metDict['D'],'cardinal']
-    Precip  = [metDict['Pp'],'%']
-    Weather = metDict['W']
-
-    # Convert forecast units as required
-    Temp    = observation.Units(Temp,Config['Units']['Temp'])
-    WindSpd = observation.Units(WindSpd,Config['Units']['Wind'])
-
-    # Define and format labels
-    metData['Time']    = Now
-    metData['Issued']  = Issued
-    metData['Valid']   = '{:02.0f}'.format(Valid) + ':00'
-    metData['Temp']    = ['{:.1f}'.format(Temp[0]),Temp[1]]
-    metData['WindDir'] = WindDir[0]
-    metData['WindSpd'] = ['{:.0f}'.format(WindSpd[0]),WindSpd[1]]
-    metData['Weather'] = Weather
-    metData['Precip']  = Precip[0]
-
-    # Return metData dictionary
-    return metData
-
-def ExtractDarkSky(app):
-    metData = app.MetData
-    Config = app.config
-
-    """ Parse the weather forecast from DarkSky
-
-    INPUTS:
-        metData             Dictionary holding weather forecast data
-        Config              Station configuration
-
-    OUTPUT:
-        metData             Dictionary holding weather forecast data
-    """
-
-    # Get current time in station time zone
-    Tz = pytz.timezone(Config['Station']['Timezone'])
-    Now = datetime.now(pytz.utc).astimezone(Tz)
-
-    # Extract all forecast data from DarkSky JSON file. If  forecast is
-    # unavailable, set forecast variables to blank and indicate to user that
-    # forecast is unavailable
-    Tz = pytz.timezone(Config['Station']['Timezone'])
-    try:
-        metDict = (metData['Dict']['hourly']['data'])
-    except KeyError:
-        metData['Time']    = Now
-        metData['Temp']    = '--'
-        metData['WindDir'] = '--'
-        metData['WindSpd'] = '--'
-        metData['Weather'] = 'ForecastUnavailable'
-        metData['Precip']  = '--'
-        metData['Valid']   = '--'
-
-        # Attempt to download forecast again in 10 minutes and return
-        # metData dictionary
-        Clock.schedule_once(lambda dt: Download(app), 600)
-        return metData
-
-    # Extract 'valid from' time of all available hourly forecasts, and
-    # retrieve forecast for the current hourly period
-    Times = list(item['time'] for item in metDict)
-    metDict = metDict[bisect.bisect(Times,int(time.time()))-1]
-
-    # Extract 'Issued' and 'Valid' times
-    Issued = Times[0]
-    Valid = Times[bisect.bisect(Times,int(time.time()))]
-    Issued = datetime.fromtimestamp(Issued,pytz.utc).astimezone(Tz)
-    Valid = datetime.fromtimestamp(Valid,pytz.utc).astimezone(Tz)
-
-    # Extract weather variables from DarkSky forecast
-    Temp    = [metDict['temperature'],'c']
-    WindSpd = [metDict['windSpeed']/2.2369362920544,'mps']
-    WindDir = [metDict['windBearing'],'degrees']
-    Precip  = [metDict['precipProbability']*100,'%']
-    Weather =  metDict['icon']
-
-    # Convert forecast units as required
-    Temp = observation.Units(Temp,Config['Units']['Temp'])
-    WindSpd = observation.Units(WindSpd,Config['Units']['Wind'])
-
-    # Define and format labels
-    metData['Time']    = Now
-    metData['Issued']  = datetime.strftime(Issued,'%H:%M')
-    metData['Valid']   = datetime.strftime(Valid,'%H:%M')
-    metData['Temp']    = ['{:.1f}'.format(Temp[0]),Temp[1]]
-    metData['WindDir'] = derive.CardinalWindDirection(WindDir)[2]
-    metData['WindSpd'] = ['{:.0f}'.format(WindSpd[0]),WindSpd[1]]
-    metData['Precip']  = '{:.0f}'.format(Precip[0])
-
-    # Define weather icon
-    if Weather == 'clear-day':
-        metData['Weather'] = '1'
-    elif Weather == 'clear-night':
-        metData['Weather'] = '0'
-    elif Weather == 'rain':
-        metData['Weather'] = '12'
-    elif Weather == 'snow':
-        metData['Weather'] = '27'
-    elif Weather == 'sleet':
-        metData['Weather'] = '18'
-    elif Weather == 'wind':
-        metData['Weather'] = 'wind'
-    elif Weather == 'fog':
-        metData['Weather'] = '6'
-    elif Weather == 'cloudy':
-        metData['Weather'] = '7'
-    elif Weather == 'partly-cloudy-day':
-        metData['Weather'] = '3'
-    elif Weather == 'partly-cloudy-night':
-        metData['Weather'] = '2'
+    # Verify API response and extract forecast
+    if requestAPI.forecast.verifyResponse(Data,'forecast'):
+        metData['Dict'] = Data.json()['forecast']
     else:
-        metData['Weather'] = 'ForecastUnavailable'
+        Clock.schedule_once(lambda dt: Download(app), 600)
+        if not 'Dict' in metData:
+            metData['Dict'] = {}
+    Extract(app)
+    ExtractDaily(app)
 
     # Return metData dictionary
     return metData
 
-def ExtractWeatherFlow(app):
+
+def Extract(app):
     metData = app.MetData
     Config = app.config
     """ Parse the weather forecast from DarkSky
@@ -286,8 +81,8 @@ def ExtractWeatherFlow(app):
     # forecast is unavailable
     Tz = pytz.timezone(Config['Station']['Timezone'])
     try:
-        wfDict = metData['Dict']['forecast']['hourly']
-        wfDayDict = metData['Dict']['forecast']['daily'][0]
+        wfDict = metData['Dict']['hourly']
+        wfDayDict = metData['Dict']['daily'][0]
         metData['stationOnline'] = metData['Dict']['station']['is_station_online']
         metData['stationUsed'] = metData['Dict']['station']['includes_tempest']
     except KeyError:
@@ -368,7 +163,7 @@ def ExtractWeatherFlow(app):
     # Return metData dictionary
     return metData
 
-def ExtractDailyWeatherFlow(app):
+def ExtractDaily(app):
     metData = app.MetData
     dailyForecast = app.DailyForecast
     Config = app.config
@@ -387,7 +182,7 @@ def ExtractDailyWeatherFlow(app):
     for i in range(len(dailyForecast.panels)):
         d = {}
         try:
-            wfDayDict = metData['Dict']['forecast']['daily'][i]
+            wfDayDict = metData['Dict']['daily'][i]
 
             # Extract weather variables from WeatherFlow forecast
             date    = "%02d/%02d" % (wfDayDict['month_num'], wfDayDict['day_num'])
