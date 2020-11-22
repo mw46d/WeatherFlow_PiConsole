@@ -39,7 +39,14 @@ def JSON(Section):
                  {'type': 'bool', 'desc': 'Switch to lightning panel when a strike is detected',
                   'title': 'Lightning panel','section': 'Display', 'key': 'LightningPanel'},
                  {'type': 'bool', 'desc': 'Show indoor temperature',
-                  'title': 'Indoor temperature','section': 'Display', 'key': 'IndoorTemp'},]
+                  'title': 'Indoor temperature','section': 'Display', 'key': 'IndoorTemp'},
+                 {'type': 'bool', 'desc': 'Show cursor',
+                  'title': 'Cursor','section': 'Display', 'key': 'Cursor'},
+                 {'type': 'bool', 'desc': 'Set console to run fullscreen',
+                  'title': 'Fullscreen','section': 'Display', 'key': 'Fullscreen'},
+                 {'type': 'bool', 'desc': 'Display console window with border',
+                  'title': 'Border','section': 'Display', 'key': 'Border'}
+                ]
     elif 'Units' in Section:
         Data =  [
                  {'type':'FixedOptions', 'options':['c','f'],'title':'Temperature',
@@ -105,6 +112,19 @@ def JSON(Section):
                   'desc':'Set the maximum temperature for "Feeling hot"', 'section':'FeelsLike', 'key':'Hot'},
                  {'type':'ToggleTemperature', 'title':'Very Hot',
                   'desc':'Set the maximum temperature for "Feeling very hot"', 'section':'FeelsLike', 'key':'VeryHot'}
+                ]
+    elif 'Station' in Section:
+        Data =  [
+                 {'type':'string', 'title':'Station ID',
+                  'desc':'Set the Station ID', 'section':'Station', 'key':'StationID'},
+                 {'type':'string', 'title':'Tempest ID',
+                  'desc':'Set the Tempest ID', 'section':'Station', 'key':'TempestID'},
+                 {'type':'string', 'title':'Sky ID',
+                  'desc':'Set the Sky ID', 'section':'Station', 'key':'SkyID'},
+                 {'type':'string', 'title':'Outdoor Air ID',
+                  'desc':'Set the Outdoor Air ID', 'section':'Station', 'key':'OutAirID'},
+                 {'type':'string', 'title':'Indoor Air ID',
+                  'desc':'Set the Indoor Air ID', 'section':'Station', 'key':'InAirID'}
                 ]
 
     # Returns JSON object for settings section

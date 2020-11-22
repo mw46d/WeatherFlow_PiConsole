@@ -1,18 +1,19 @@
 # WeatherFlow PiConsole
-Raspberry Pi Python console for the WeatherFlow Tempest and Smart Home Weather
+Python console for the WeatherFlow Tempest and Smart Home Weather
 stations. The console uses the WeatherFlow REST API and websocket to stream data
 from your Weather Flow Tempest or Smart Home Weather station in real time via
-the internet. As soon as the data from your station reaches the WeatherFlow
-servers, it is pushed immediately to the console, including the 3-second rapid
-fire wind updates.
+the internet. As soon as data from your station reaches the WeatherFlow servers, 
+it is pushed immediately to the console, including the 3-second rapid wind 
+updates.
 
-Many of the graphical elements in the console are based on the Weather34 Home
-Weather Station Template (https://www.weather34.com/homeweatherstation/)
-copyright 2015-2020 Brian Underdown. The Weather34 Home Weather Station Template
-is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
-International License.
+For a list of supported features and screenshots of the console in action, please
+checkout its page on the WeatherFlow community forums: https://community.weatherflow.com/t/weatherflow-piconsole/1933
 
-https://weatherflow.com/tempest-weather-system/
+The WeatherFlow PiConsole can be run on a Raspberry Pi 3 or 4 running Raspberry 
+Pi OS , or on a PC running Ubuntu 18.04 LTS or Raspberry Pi OS. It is  currently 
+*not* compatible with Ubuntu 20.04 without downgrading Python to version 3.7 
+
+https://weatherflow.com/tempest-weather-system/<br/>
 https://community.weatherflow.com/
 
 ## Contents
@@ -21,6 +22,7 @@ https://community.weatherflow.com/
 **[Update Instructions](#update-instructions)**<br>
 **[Auto-Start Instructions](#auto-start-instructions)**<br>
 **[Advanced Installation: Windows](#advanced-installation-windows)**<br>
+**[Credits](#credits)**<br>
 
 ## Installation Instructions
 
@@ -29,11 +31,12 @@ be started from the terminal with a single command. The automated installation
 should take ~1 hour.
 
 The automated installer assumes you have already sucesfully setup your Raspberry
-Pi and have installed Raspberry Pi OS with Desktop. You should have also
-attached the touch screen, and have either a keyboard and mouse attached
+Pi and have installed Raspberry Pi OS with Desktop, or you ar running on a PC
+with Ubuntu 18.04 or Raspberry Pi OS installed. For a Raspberry Pi you should 
+have also attached the touch screen, and have either a keyboard and mouse attached
 directly to the Pi, or have accessesd the Pi remotely through SSH/VNC. If you
-are starting from scratch, the Raspberry Pi documentation should help get you
-started:
+are starting from scratch with a Raspberry Pi, the documentation should help 
+get you started:
 
 * https://www.raspberrypi.org/documentation/
 
@@ -67,17 +70,22 @@ Please note that you also cannot use SSH to start the console on a Raspberry Pi
 
 ### Configure and Run WeatherFlow PiConsole
 
-When the console is run for the first time, you'll be asked to enter a CheckWX 
-Aviation Weather API key. This key is required to download the closest METAR 
-information to your station location and can be obtained by registering for a 
-free account here: https://www.checkwxapi.com/auth/signup
+When the console is run for the first time, you'll be asked to enter a
+WeatherFlow Personal Access Token and a CheckWX Aviation Weather API key. The
+Personal Access Token is required for the PiConsole to access the data from your
+station, and the CheckWX API key is required to download the closest METAR 
+information to your station location. 
 
-Once you have registered with CheckWX, go ahead and run the console for the 
-first time using:
+A Personal Access Token can be generated, viewed, and deleted here: https://tempestwx.com/settings/tokens,
+and a CheckWX API key can be obtained by registering for a free account here: 
+https://www.checkwxapi.com/auth/signup
+
+Once you have a Personal Access Token and registered with CheckWX, go ahead 
+and run the console for the first time using:
 ```
 wfpiconsole start
 ```
-You'll be asked to enter the API key you have just signed-up for above, as well
+You'll be asked to enter the API keys you have just generated above, as well
 as information about your station. This includes your station ID and device IDs
 for your AIR, SKY, or TEMPEST modules. To find this information either open the
 WeatherFlow app or view your station page in a web browser. Click on the gear 
@@ -87,8 +95,19 @@ If all goes smoothly the console should automatically add the extra information
 it needs to your configuration file and then start running. You should not need
 to enter this configuration information again.
 
-Congratulations, you have installed the Raspberry Pi Python console for the
-Weather Flow Tempest and Smart Home Weather Stations.
+Congratulations, you have installed the PiConsole for the Weather Flow Tempest 
+and Smart Home Weather Stations.
+
+### Screen size
+
+By default the PiConsole will run in full screen mode. If you are running on a 
+Raspberry Pi 4 or a PC with Raspberry Pi OS or Ubuntu 18.04 LTS, fullscreen mode 
+can be disabled in Menu -> Settings -> Display. In this case the console will 
+use the dimensions specified in the configuration file (```wfpiconsole.ini```), 
+which can be changed manually. Please note that extreme changes to the aspect 
+ratio will result in text fields running into one another. Under Settings -> 
+Display there are also settings to show/hide the cursor and show/hide the window
+border.  
 
 ## Update Instructions
 
@@ -171,3 +190,11 @@ del /f PiConsole.tar.gz
 As this is the first time you have run the console, you’ll be asked for some API
 keys. Details of what you need can be found under "Configure and Run WeatherFlow
 PiConsole" in the **[Installation Instructions](#installation-instructions)**.
+
+## Credits
+
+Many of the graphical elements in the console are based on the Weather34 Home
+Weather Station Template (https://www.weather34.com/homeweatherstation/)
+copyright 2015-2020 Brian Underdown. The Weather34 Home Weather Station Template
+is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
+International License.
