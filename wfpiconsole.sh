@@ -930,11 +930,11 @@ fi
 
 # CHECK OS/HARDWARE AND ADD REQUIRED REPOSITORIES WHEN INSTALL OR UPDATING
 # ------------------------------------------------------------------------------
-if [[ "${1}" == "install" ]] || [[ "${1}" == "runUpdate" ]] || [[ "${1}" == "runBeta" ]] ; then
+if [[ "${1}" == "install" ]] || [[ "${1}" == "runUpdate" ]] || [[ "${1}" == "runBeta" ]] || [[ "${1}" == "patch" ]] ; then
 
     # Check compatability of hardware/OS
     PROCESSOR=$(uname -m)
-    if [[ "$PROCESSOR" = "arm"* ]] || [[ "$PROCESSOR" = "x86_64"* ]] || [[ "$PROCESSOR" = "i386"* ]]; then
+    if [[ $PROCESSOR = arm* ]] || [[ $PROCESSOR = x86_64 ]] || [[ $PROCESSOR = i*86 ]]; then
         printf "  %b Hardware check passed (%b)\\n" "${TICK}" "${PROCESSOR}"
     else
         printf "  %b Hardware check failed (%b)\\n\\n" "${CROSS}" "${PROCESSOR}"
