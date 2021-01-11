@@ -106,7 +106,7 @@ void setup(void) {
 
   server.on("/", handleRoot);
   server.on("/sensors", handleSensors);
-  server.onNotFound(handleNotFound);
+  portal.onNotFound(handleNotFound);
 
   if (!portal.begin()) {
     char l = 0;
