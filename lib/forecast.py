@@ -177,8 +177,8 @@ def Download(metData,Config,dt):
         else:
             metData['Icon'] = '--'
 
-        metData['stationOnline'] = metData['Dict']['station']['is_station_online']
-        metData['stationUsed'] = metData['Dict']['station']['includes_tempest']
+        # XXX Not included any longer metData['stationOnline'] = metData['Dict']['station']['is_station_online']
+        # XXX Not included any longer metData['stationUsed'] = metData['Dict']['station']['includes_tempest']
 
     # Unable to extract forecast data from JSON object. Set set forecast
     # variables to blank and indicate to user that forecast is unavailable
@@ -200,8 +200,8 @@ def Download(metData,Config,dt):
         metData['Status']       = 'Forecast currently\nunavailable...'
         funcError               = 1
 
-        metData['stationOnline'] = False
-        metData['stationUsed'] = False
+        # XXX Not included any longer metData['stationOnline'] = False
+        # XXX Not included any longer metData['stationUsed'] = False
 
     # Schedule new forecast to be downloaded at the top of the next hour, or in
     # 5 minutes if error was detected. Note secondsSched refers to number of
